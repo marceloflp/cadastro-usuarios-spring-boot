@@ -1,5 +1,9 @@
 package com.projetomf.cadastroUsuarios.repositories;
 
-public class UsuarioRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.projetomf.cadastroUsuarios.entities.Usuario;
+
+public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
 }

@@ -1,16 +1,21 @@
 package com.projetomf.cadastroUsuarios.entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 //Criando entidade Usuario
 @Entity
-public class Usuario {
+@Table(name = "tb_usuario")
+public class Usuario implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	//Gerando ID com auto incremento 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.projetomf.cadastroUsuarios.services.exceptions.DataBaseException;
 import com.projetomf.cadastroUsuarios.services.exceptions.ResourceNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,13 +14,25 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ResourceExceptionHandler {
 
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e,HttpServletRequest request){
+	public ResponseEntity<StandardError> resourceNotFound(ResourceNotFoundException e, HttpServletRequest request) {
 		String msg = "Resource Not Found";
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		
-		StandardError error = new StandardError(Instant.now(), status.value(), msg, e.getMessage(), request.getRequestURI());
-		
+
+		StandardError error = new StandardError(Instant.now(), status.value(), msg, e.getMessage(),
+				request.getRequestURI());
+
 		return ResponseEntity.status(status).body(error);
 	}
-	
+
+	@ExceptionHandler(DataBaseException.class)
+	public ResponseEntity<StandardError> database(DataBaseException e, HttpServletRequest request) {
+		String msg = "Database error";
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+
+		StandardError error = new StandardError(Instant.now(), status.value(), msg, e.getMessage(),
+				request.getRequestURI());
+
+		return ResponseEntity.status(status).body(error);
+	}
+
 }

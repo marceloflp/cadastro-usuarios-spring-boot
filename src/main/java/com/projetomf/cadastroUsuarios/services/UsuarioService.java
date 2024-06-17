@@ -4,10 +4,16 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.projetomf.cadastroUsuarios.entities.Usuario;
 import com.projetomf.cadastroUsuarios.repositories.UsuarioRepository;
+import com.projetomf.cadastroUsuarios.services.exceptions.DataBaseException;
+import com.projetomf.cadastroUsuarios.services.exceptions.ResourceNotFoundException;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class UsuarioService {
@@ -21,7 +27,7 @@ public class UsuarioService {
 
 	public Usuario findById(Long id) {
 		Optional<Usuario> obj =repository.findById(id);
-		return obj.get();
+		return obj.orElseThrow(() -> new ResourceNotFoundException(id));
 	}
 
 	public Usuario insert(Usuario obj) {
@@ -29,13 +35,24 @@ public class UsuarioService {
 	}
 
 	public void delete(Long id) {
-		repository.deleteById(id);
+		try {
+			if(!repository.existsById(id)) throw new ResourceNotFoundException(id);
+			repository.deleteById(id);
+		} catch(EmptyResultDataAccessException e) {
+			throw new ResourceNotFoundException(id);
+		} catch(DataIntegrityViolationException e) {
+			throw new DataBaseException(e.getMessage());
+		}
 	}
 
 	public Usuario update(Long id, Usuario obj) {
-		Usuario entity = repository.getReferenceById(id);
-		updateData(entity, obj);
-		return repository.save(entity);
+		try {
+			Usuario entity = repository.getReferenceById(id);
+			updateData(entity, obj);
+			return repository.save(entity);
+		} catch(EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateData(Usuario entity, Usuario obj) {
